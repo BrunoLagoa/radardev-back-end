@@ -3,9 +3,9 @@ const DevController = require("./controllers/DevController");
 const SearchController = require("./controllers/SearchController");
 
 // Tipos de parametros:
-// Query params
-// Route params
-// Body
+// Query params: request.query
+// Route params: request.params
+// Body: request.body
 
 const routes = Router();
 
