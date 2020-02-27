@@ -1,6 +1,7 @@
 const axios = require("axios");
 const Dev = require("../models/Dev");
 const parseStringAsArray = require("../utils/parseStringAsArray");
+const { findConnections, sendMessage } = require("../websocket");
 
 module.exports = {
   async index(req, res) {
@@ -10,9 +11,7 @@ module.exports = {
   },
 
   async store(req, res) {
-    const { github_username, techs, latitude, longitude } = req.body.data;
-
-    console.log(github_username, techs, latitude, longitude);
+    const { github_username, techs, latitude, longitude } = req.body;
 
     let dev = await Dev.findOne({ github_username });
 
@@ -38,6 +37,15 @@ module.exports = {
         techs: techsArray,
         location
       });
+
+      // filtra as conexoes que estao ha no maximo 10km de distancias
+      // e que o novo deve tenha pelo menos uma das tecnologias filtradas
+      const sendSocketMessageTo = findConnections(
+        { latitude, longitude },
+        techsArray
+      );
+
+      sendMessage(sendSocketMessageTo, "new-dev", dev);
     }
 
     return res.json(dev);
